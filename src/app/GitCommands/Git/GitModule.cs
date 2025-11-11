@@ -2885,7 +2885,7 @@ public sealed partial class GitModule : IGitModule
 
     /// <summary>Attempt to read the branch name from the HEAD file instead of calling a git command.</summary>
     /// <remarks>Dirty but fast. This sometimes fails. In reftable repos, it always returns ".invalid".</remarks>
-    public static string GetSelectedBranchFast(string? repositoryPath, bool emptyIfDetached = false)
+    internal static string GetSelectedBranchFast(string? repositoryPath, bool emptyIfDetached = false)
     {
         if (string.IsNullOrEmpty(repositoryPath))
         {
@@ -2929,13 +2929,16 @@ public sealed partial class GitModule : IGitModule
         return headFileContents[prefix.Length..].TrimEnd();
     }
 
-    public string GetSelectedBranch(bool emptyIfDetached = false)
+    public string GetSelectedBranch(bool emptyIfDetached = false, bool tryFastMethodFirst = true)
     {
-        string head = GetSelectedBranchFast(WorkingDir, emptyIfDetached);
-
-        if (!string.IsNullOrEmpty(head) && head != ".invalid")
+        if (tryFastMethodFirst)
         {
-            return head;
+            string head = GetSelectedBranchFast(WorkingDir, emptyIfDetached);
+
+            if (!string.IsNullOrEmpty(head) && head != ".invalid")
+            {
+                return head;
+            }
         }
 
         GitArgumentBuilder args = new("symbolic-ref")

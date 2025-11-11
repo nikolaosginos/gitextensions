@@ -209,10 +209,11 @@ public interface IGitModule
     /// Gets the name of the currently checked out branch.
     /// </summary>
     /// <param name="emptyIfDetached">Defines the value returned if HEAD is detached. <see langword="true"/> to return <see cref="string.Empty"/>; <see langword="false"/> to return "(no branch)".</param>
+    /// <param name="tryFastMethodFirst">Defines whether to try getting the branch name by reading the HEAD file before executing a git command. <see langword="true"/> to return <see cref="string.Empty"/>; <see langword="false"/> to return "(no branch)".</param>
     /// <returns>
     /// The name of the branch (for example: "main"); the value requested by <paramref name="emptyIfDetached"/>, if HEAD is detached.
     /// </returns>
-    string GetSelectedBranch(bool emptyIfDetached = false);
+    string GetSelectedBranch(bool emptyIfDetached = false, bool tryFastMethodFirst = true);
 
     /// <summary>true if ".git" directory does NOT exist.</summary>
     bool IsBareRepository();

@@ -1,7 +1,7 @@
-﻿using GitCommands;
-using GitCommands.Git;
+﻿using GitCommands.Git;
+using GitExtensions.Extensibility.Git;
 
-namespace GitUI;
+namespace GitCommands;
 
 /// <summary>
 ///  Provides the name of the currently checked out branch in a repository.
@@ -16,7 +16,7 @@ public interface IRepositoryCurrentBranchNameProvider
     string GetCurrentBranchName(string repositoryPath);
 }
 
-internal sealed class RepositoryCurrentBranchNameProvider : IRepositoryCurrentBranchNameProvider
+public sealed class RepositoryCurrentBranchNameProvider : IRepositoryCurrentBranchNameProvider
 {
     public string GetCurrentBranchName(string repositoryPath)
     {
@@ -26,11 +26,12 @@ internal sealed class RepositoryCurrentBranchNameProvider : IRepositoryCurrentBr
         }
 
         string branchName = GitModule.GetSelectedBranchFast(repositoryPath);
-        if (string.IsNullOrWhiteSpace(branchName) || branchName == DetachedHeadParser.DetachedBranch)
+
+        if (!string.IsNullOrEmpty(branchName) && branchName != ".invalid")
         {
-            branchName = $"({TranslatedStrings.NoBranch})";
+            return branchName;
         }
 
-        return branchName;
+        return new GitModule(repositoryPath).GetSelectedBranch(false, false);
     }
 }
